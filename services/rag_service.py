@@ -2,15 +2,26 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 
 MODEL_NAME = "HuggingFaceTB/SmolLM2-135M-Instruct"
 
-tokenizer = AutoTokenizer.from_pretrained(
-    MODEL_NAME
-)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
-llm = AutoModelForCausalLM.from_pretrained(
-    MODEL_NAME
-)
+llm = None
+
+
+def get_model():
+    global llm
+
+    if llm is None:
+        llm = AutoModelForCausalLM.from_pretrained(
+            MODEL_NAME,
+            low_cpu_mem_usage=True
+        )
+
+    return llm
+
 
 def generate_answer(question: str):
+
+    model = get_model()
 
     messages = [
         {
@@ -30,7 +41,7 @@ def generate_answer(question: str):
         return_tensors="pt"
     )
 
-    outputs = llm.generate(
+    outputs = model.generate(
         **inputs,
         max_new_tokens=100,
         do_sample=False
@@ -41,4 +52,4 @@ def generate_answer(question: str):
         skip_special_tokens=True
     )
 
-    return answer   
+    return answer
