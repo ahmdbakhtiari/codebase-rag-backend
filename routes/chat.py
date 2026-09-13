@@ -11,6 +11,9 @@ class chatRequest(BaseModel):
 
 @router.post("/")
 def chat(request: chatRequest):
+
     user_question = request.message
+
     user_answer = rag_service.generate_answer(user_question)
-    return {"response": {user_answer}}
+
+    return {"response": user_answer}
